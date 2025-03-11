@@ -1,5 +1,6 @@
 package codegym.c10.security.config;
 
+import codegym.c10.security.controller.CustomSuccessHandle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -34,6 +35,12 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CustomSuccessHandle customSuccessHandle(){
+        return new CustomSuccessHandle();
+    }
+
+
+    @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         UserDetails user = User.withUsername("dung").password("$2a$12$bN172N/EcowoNYC3k4D7lOuY2Bg322IpF9Dp5UJDFhOJjckUv/X0e").roles("USER").build();
         UserDetails admin = User.withUsername("dung1").password("dung1").roles("ADMIN").build();
@@ -47,7 +54,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
-        ).formLogin(Customizer.withDefaults())
+//        ).formLogin(Customizer.withDefaults())
+                ).formLogin(f -> f.successHandler(customSuccessHandle()))
                 .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
